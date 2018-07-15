@@ -159,7 +159,12 @@ var
   InStream: TFileStream;
   OutStream: TFileStream;
   OutName: String;
-  Result: TJpegExtractResult;
+  Result: TJpegExtractResult = (
+    InputSize: 0;
+    CalculatedJpegSize: 0;
+    RealJpegSize: 0;
+    IsSuccess: False;
+  );
 begin
   OutName := JpegName(InName);
   WriteExtractingMessage(InName, OutName);
@@ -175,7 +180,7 @@ begin
       end;
     finally
       FreeAndNil(OutStream);
-      if Result.CalculatedJpegSize <= 0 then begin
+      if not Result.IsSuccess then begin
         DeleteFile(OutName);
       end;
     end;

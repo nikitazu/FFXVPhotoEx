@@ -12,6 +12,7 @@ type
     InputSize: LongInt;
     CalculatedJpegSize: LongInt;
     RealJpegSize: LongInt;
+    IsSuccess: Boolean;
   end;
 
   TJpegSsExtractor = class(TComponent)
@@ -32,6 +33,7 @@ function TJpegSsExtractor.Extract(
   const OutStream: TFileStream
 ): TJpegExtractResult;
 begin
+  Result.IsSuccess := False;
   Result.InputSize := InStream.Size;
   Result.CalculatedJpegSize := Result.InputSize - ImageStartOffset - ImageEndOffset;
 
@@ -42,6 +44,7 @@ begin
   InStream.Seek(ImageStartOffset, soFromBeginning);
   OutStream.Position := 0;
   Result.RealJpegSize := OutStream.CopyFrom(InStream, Result.CalculatedJpegSize);
+  Result.IsSuccess := Result.RealJpegSize > 0;
 end;
 
 end.
