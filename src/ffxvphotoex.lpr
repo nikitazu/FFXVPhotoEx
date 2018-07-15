@@ -8,7 +8,7 @@ uses
   {$ENDIF}{$ENDIF}
   Classes, SysUtils, CustApp,
   { you can add units after this }
-  FileUtil;
+  FileUtil, RegExpr;
 
 type
 
@@ -25,12 +25,15 @@ type
     procedure OnFileFound(FileIterator: TFileIterator);
     procedure ProcessFile(const InName: String);
     procedure ExtractImage(const InName: String);
+    function JpegName(const InName: String): String;
   end;
 
 { TFFXVPhotoEx }
 
 var
   ContinueOnError: Boolean = False;
+  FileNameRegex: TRegExpr;
+const
   ecFail: LongInt = 1;
 
 procedure TFFXVPhotoEx.DoRun;
@@ -59,26 +62,30 @@ begin
   end;
 
   ContinueOnError := HasOption('c', 'continue-on-error');
-
+  FileNameRegex := TRegExpr.Create('^(.*)(\.ss)$');
   try
-    if HasOption('d', 'dir') then begin
-      ProcessDirectory(GetOptionValue('d', 'dir'));
-      Terminate;
-      Exit;
-    end;
+    try
+      if HasOption('d', 'dir') then begin
+        ProcessDirectory(GetOptionValue('d', 'dir'));
+        Terminate;
+        Exit;
+      end;
 
-    if HasOption('f', 'file') then begin
-      ProcessFile(GetOptionValue('f', 'file'));
-      Terminate;
-      Exit;
+      if HasOption('f', 'file') then begin
+        ProcessFile(GetOptionValue('f', 'file'));
+        Terminate;
+        Exit;
+      end;
+    except
+      on E: Exception do begin
+        WriteLn(StdErr, 'Processing failed with error: ', E.Message);
+        Terminate;
+        ExitCode := ecFail;
+        Exit;
+      end;
     end;
-  except
-    on E: Exception do begin
-      WriteLn(StdErr, 'Processing failed with error: ', E.Message);
-      Terminate;
-      ExitCode := ecFail;
-      Exit;
-    end;
+  finally
+    FreeAndNil(FileNameRegex);
   end;
 
   // No parameters found, print usage
@@ -178,13 +185,13 @@ const
   ImageStartOffset = 36;
   ImageEndOffset = 130;
 begin
-  OutName := InName + '.jpg';
+  OutName := JpegName(InName);
 
   WriteLn('Extracting ', InName, ' to ', OutName);
 
   InStream := TFileStream.Create(InName, fmOpenRead);
   try
-    OutStream := TFileStream.Create(OutName, fmOpenWrite);
+    OutStream := TFileStream.Create(OutName, fmCreate);
     try
       InSize := InStream.Size;
       OutSize := InSize - ImageStartOffset - ImageEndOffset;
@@ -215,7 +222,15 @@ begin
   finally
     FreeAndNil(InStream);
   end;
+end;
 
+function TFFXVPhotoEx.JpegName(const InName: String): String;
+begin
+  if FileNameRegex.Exec(InName) then begin
+    Result := FileNameRegex.Replace(InName, '$1.jpg', True);
+  end else begin
+    Result := InName + '.jpg';
+  end;
 end;
 
 var

@@ -6,7 +6,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [TODO]
 - Debian package.
-- Replace .ss with .jpg instead of appending.
 - Manual.
 - OSX port.
 - Windows port.
@@ -18,7 +17,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Extract JPEG image out of FF15 Photo Snapshot files (.ss).
 - Takes exactly one file as input.
 - Extracts JPEG image out of it.
-- Puts image under the name input-file-name.ss.jpg.
+- Puts image under the name input-file-name.jpg.
 - Takes directory as input and processes .ss files inside.
 - Returns 0 if all is well.
 - Use stderr for errors.
