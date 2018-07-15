@@ -69,10 +69,10 @@ begin
   Extractor := TJpegSsExtractor.Create(Self);
   try
     if HasOption('d', 'dir') then begin
-      ProcessDirectory(GetOptionValue('d', 'dir'));
+      ProcessDirectory(ExpandFileNameUTF8(GetOptionValue('d', 'dir')));
       ProcessedOk := True;
     end else if HasOption('f', 'file') then begin
-      ProcessFile(GetOptionValue('f', 'file'));
+      ProcessFile(ExpandFileNameUTF8(GetOptionValue('f', 'file')));
       ProcessedOk := True;
     end;
   except
