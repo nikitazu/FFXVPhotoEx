@@ -31,6 +31,7 @@ type
 
 var
   ContinueOnError: Boolean = False;
+  ecFail: LongInt = 1;
 
 procedure TFFXVPhotoEx.DoRun;
 var
@@ -41,9 +42,10 @@ begin
 
   ErrorMsg:=CheckOptions('hd:f:c', 'help dir: file: continue-on-error');
   if ErrorMsg<>'' then begin
-    WriteLn(ErrorMsg);
+    WriteLn(StdErr, ErrorMsg);
     WriteHelp;
     Terminate;
+    ExitCode := ecFail;
     Exit;
   end;
 
@@ -72,9 +74,9 @@ begin
     end;
   except
     on E: Exception do begin
-      WriteLn('Processing failed!');
-      ShowException(E);
+      WriteLn(StdErr, 'Processing failed with error: ', E.Message);
       Terminate;
+      ExitCode := ecFail;
       Exit;
     end;
   end;
@@ -82,9 +84,11 @@ begin
   // No parameters found, print usage
   //
 
-  WriteLn('No arguments specified');
+  WriteLn(StdErr, 'No arguments specified');
   WriteHelp;
   Terminate;
+  ExitCode := ecFail;
+  Exit;
 end;
 
 constructor TFFXVPhotoEx.Create(TheOwner: TComponent);
@@ -139,7 +143,7 @@ begin
   except
     on E: Exception do begin
       if ContinueOnError then begin
-        WriteLn('Skipping file ', FileIterator.FileName, ' because ', E.Message);
+        WriteLn(StdErr, 'Skipping file ', FileIterator.FileName, ' because ', E.Message);
       end else begin
         FileIterator.Stop;
         raise Exception.Create(
@@ -195,7 +199,8 @@ begin
 
       if NumWrittenTotal <> OutSize then begin
         WriteLn(
-          'Warning: number of written bytes differs: expected='
+          StdErr
+        , 'Warning: number of written bytes differs: expected='
         , OutSize
         , ' actual='
         , NumWrittenTotal

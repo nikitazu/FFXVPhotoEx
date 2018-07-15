@@ -11,7 +11,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - OSX port.
 - Windows port.
 - Tests for good and bad inputs.
-- Use stderr for errors.
 
 ## [Unreleased]
 
@@ -22,7 +21,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Puts image under the name input-file-name.ss.jpg.
 - Takes directory as input and processes .ss files inside.
 - Returns 0 if all is well.
-- Prints error on stdout and exits with 1 if something failed.
+- Use stderr for errors.
+- Process exits with 1 if something failed.
 
 ## [0.0.1] - 2018-MM-DD
 ### Added
