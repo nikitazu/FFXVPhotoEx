@@ -50,7 +50,7 @@ end;
 
 procedure WriteExtractingMessage(InName: String; OutName: String);
 begin
-  WriteLn('Extracting ', InName, ' to ', OutName);
+  WriteLn('Extracting <', InName, '> to <', OutName, '>');
 end;
 
 procedure WriteSizeMismatchWarning(CalcSize: LongInt; RealSize: LongInt);

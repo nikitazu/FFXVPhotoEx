@@ -8,7 +8,10 @@ uses
   {$ENDIF}{$ENDIF}
   Classes, SysUtils, CustApp,
   { you can add units after this }
-  FileUtil, JpegSsExtractor, AppOutputWriter;
+  FileUtil,
+  LazFileUtils, // After FileUtil to shadow deprecated functions
+  JpegSsExtractor,
+  AppOutputWriter;
 
 type
 
@@ -111,7 +114,7 @@ procedure TFFXVPhotoEx.ProcessDirectory(const InName: String);
 var
   FS: TFileSearcher;
 begin
-  if DirectoryExists(InName) then begin
+  if DirectoryExistsUTF8(ChompPathDelim(InName)) then begin
     try
       FS := TFileSearcher.Create;
       FS.OnFileFound := @OnFileFound;
@@ -147,7 +150,7 @@ end;
 
 procedure TFFXVPhotoEx.ProcessFile(const InName: String);
 begin
-  if (FileExists(InName) and not DirectoryExists(InName)) then begin
+  if (FileExistsUTF8(InName) and not DirectoryExistsUTF8(ChompPathDelim(InName))) then begin
     ExtractImage(InName);
   end else begin
     raise Exception.Create('File not found: ' + InName);
