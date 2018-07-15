@@ -38,6 +38,7 @@ const
 procedure TFFXVPhotoEx.DoRun;
 var
   ErrorMsg: String;
+  ProcessedOk: Boolean = False;
 begin
   // Define parameters
   //
@@ -64,13 +65,10 @@ begin
   try
     if HasOption('d', 'dir') then begin
       ProcessDirectory(GetOptionValue('d', 'dir'));
-      Terminate;
-      Exit;
-    end;
-    if HasOption('f', 'file') then begin
+      ProcessedOk := True;
+    end else if HasOption('f', 'file') then begin
       ProcessFile(GetOptionValue('f', 'file'));
-      Terminate;
-      Exit;
+      ProcessedOk := True;
     end;
   except
     on E: Exception do begin
@@ -81,13 +79,13 @@ begin
     end;
   end;
 
-  // No parameters found, print usage
-  //
+  if not ProcessedOk then begin
+    WriteLn(StdErr, 'No arguments specified');
+    WriteHelp;
+    ExitCode := ecFail;
+  end;
 
-  WriteLn(StdErr, 'No arguments specified');
-  WriteHelp;
   Terminate;
-  ExitCode := ecFail;
   Exit;
 end;
 
