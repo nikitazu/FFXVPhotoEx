@@ -162,13 +162,9 @@ var
   InStream: TFileStream;
   OutStream: TFileStream;
   OutName: String;
-  Result: TJpegExtractResult = (
-    InputSize: 0;
-    CalculatedJpegSize: 0;
-    RealJpegSize: 0;
-    IsSuccess: False;
-  );
+  Result: TJpegExtractResult;
 begin
+  Result := Default(TJpegExtractResult);
   OutName := JpegName(InName);
   WriteExtractingMessage(InName, OutName);
   InStream := TFileStream.Create(InName, fmOpenRead);
