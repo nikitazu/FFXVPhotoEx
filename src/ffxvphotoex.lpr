@@ -171,11 +171,6 @@ var
   OutFileOpened: Boolean;
   OutName: String;
   OutSize: LongInt;
-
-  Buf: Array [1..4096] Of Byte;
-  NumRead: Word = 0;
-  NumReadTotal: LongInt = 0;
-  NumWritten: Word = 0;
   NumWrittenTotal: LongInt = 0;
 
   const
@@ -201,14 +196,8 @@ begin
     end;
 
     InStream.Seek(ImageStartOffset, soFromBeginning);
-    repeat
-      NumRead := InStream.Read(Buf, SizeOf(Buf));
-      NumReadTotal += NumRead;
-      if (NumReadTotal < OutSize) then begin
-        NumWritten := OutStream.Write(Buf, NumRead);
-        NumWrittenTotal += NumWritten;
-      end;
-    until (NumRead = 0) or (NumWritten <> NumRead) or (NumReadTotal >= OutSize);
+    OutStream.Position := 0;
+    NumWrittenTotal := OutStream.CopyFrom(InStream, OutSize);
 
   finally
     if InFileOpened then begin
