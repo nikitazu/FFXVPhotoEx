@@ -34,7 +34,7 @@
         <PackageName Value="LazUtils"/>
       </Item1>
     </RequiredPackages>
-    <Units Count="2">
+    <Units Count="3">
       <Unit0>
         <Filename Value="ffxvphotoex.lpr"/>
         <IsPartOfProject Value="True"/>
@@ -44,6 +44,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="JpegSsExtractor"/>
       </Unit1>
+      <Unit2>
+        <Filename Value="appoutputwriter.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="AppOutputWriter"/>
+      </Unit2>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

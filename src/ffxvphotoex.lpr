@@ -8,7 +8,7 @@ uses
   {$ENDIF}{$ENDIF}
   Classes, SysUtils, CustApp,
   { you can add units after this }
-  FileUtil, JpegSsExtractor;
+  FileUtil, JpegSsExtractor, AppOutputWriter;
 
 type
 
@@ -74,7 +74,7 @@ begin
     end;
   except
     on E: Exception do begin
-      WriteLn(StdErr, 'Processing failed with error: ', E.Message);
+      WriteProcessingFailedError(E.Message);
       Terminate;
       ExitCode := ecFail;
       Exit;
@@ -82,7 +82,7 @@ begin
   end;
 
   if not ProcessedOk then begin
-    WriteLn(StdErr, 'No arguments specified');
+    WriteNoArgsError;
     WriteHelp;
     ExitCode := ecFail;
   end;
@@ -104,19 +104,7 @@ end;
 
 procedure TFFXVPhotoEx.WriteHelp;
 begin
-  writeln('Usage: ', ExeName, ' [-f|-d] input');
-  writeln(' --help              : Prints help');
-  writeln('');
-  writeln(' --dir=indir         : Converts files inside indir from *.ss to *.jpg');
-  writeln('                       alias -d indir');
-  writeln('                       alias: -h');
-  writeln('');
-  writeln(' --file=infile.ss    : Converts infile.ss to infile.jpg');
-  writeln('                       alias -f infile.ss');
-  writeln('');
-  writeln(' --continue-on-error : Does not stop processing on error');
-  writeln('                       when processing a directory');
-  writeln('                       alias -c');
+  AppOutputWriter.WriteHelp(ExeName);
 end;
 
 procedure TFFXVPhotoEx.ProcessDirectory(const InName: String);
@@ -143,7 +131,7 @@ begin
   except
     on E: Exception do begin
       if ContinueOnError then begin
-        WriteLn(StdErr, 'Skipping file ', FileIterator.FileName, ' because ', E.Message);
+        WriteSkipFileWarning(FileIterator.FileName, E.Message);
       end else begin
         FileIterator.Stop;
         raise Exception.Create(
@@ -174,22 +162,16 @@ var
   Result: TJpegExtractResult;
 begin
   OutName := JpegName(InName);
-
-  WriteLn('Extracting ', InName, ' to ', OutName);
-
+  WriteExtractingMessage(InName, OutName);
   InStream := TFileStream.Create(InName, fmOpenRead);
   try
     OutStream := TFileStream.Create(OutName, fmCreate);
     try
       Result := Extractor.Extract(InStream, OutStream);
-      if Result.RealJpegSize <> Result.CalculatedJpegSize then begin
-        WriteLn(
-          StdErr
-        , 'Warning: number of written bytes differs: expected='
-        , Result.CalculatedJpegSize
-        , ' actual='
-        , Result.RealJpegSize
-        );
+      with Result do begin
+        if RealJpegSize <> CalculatedJpegSize then begin
+          WriteSizeMismatchWarning(CalculatedJpegSize, RealJpegSize);
+        end;
       end;
     finally
       FreeAndNil(OutStream);
