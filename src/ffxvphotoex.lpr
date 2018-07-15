@@ -8,7 +8,7 @@ uses
   {$ENDIF}{$ENDIF}
   Classes, SysUtils, CustApp,
   { you can add units after this }
-  FileUtil, RegExpr;
+  FileUtil, JpegSsExtractor;
 
 type
 
@@ -32,6 +32,7 @@ type
 
 var
   ContinueOnError: Boolean = False;
+  Extractor: TJpegSsExtractor;
 const
   ecFail: LongInt = 1;
 
@@ -62,6 +63,7 @@ begin
   end;
 
   ContinueOnError := HasOption('c', 'continue-on-error');
+  Extractor := TJpegSsExtractor.Create(Self);
   try
     if HasOption('d', 'dir') then begin
       ProcessDirectory(GetOptionValue('d', 'dir'));
@@ -167,14 +169,9 @@ end;
 procedure TFFXVPhotoEx.ExtractImage(const InName: String);
 var
   InStream: TFileStream;
-  InSize: LongInt;
   OutStream: TFileStream;
   OutName: String;
-  OutSize: LongInt;
-  NumWrittenTotal: LongInt = 0;
-const
-  ImageStartOffset = 36;
-  ImageEndOffset = 130;
+  Result: TJpegExtractResult;
 begin
   OutName := JpegName(InName);
 
@@ -184,29 +181,19 @@ begin
   try
     OutStream := TFileStream.Create(OutName, fmCreate);
     try
-      InSize := InStream.Size;
-      OutSize := InSize - ImageStartOffset - ImageEndOffset;
-
-      if ((InSize = 0) or (OutSize <= 0)) then begin
-        raise Exception.Create('Invalid file format');
-      end;
-
-      InStream.Seek(ImageStartOffset, soFromBeginning);
-      OutStream.Position := 0;
-      NumWrittenTotal := OutStream.CopyFrom(InStream, OutSize);
-
-      if NumWrittenTotal <> OutSize then begin
+      Extractor.Extract(InStream, OutStream, Result);
+      if Result.RealJpegSize <> Result.CalculatedJpegSize then begin
         WriteLn(
           StdErr
         , 'Warning: number of written bytes differs: expected='
-        , OutSize
+        , Result.CalculatedJpegSize
         , ' actual='
-        , NumWrittenTotal
+        , Result.RealJpegSize
         );
       end;
     finally
       FreeAndNil(OutStream);
-      if OutSize <= 0 then begin
+      if Result.CalculatedJpegSize <= 0 then begin
         DeleteFile(OutName);
       end;
     end;
