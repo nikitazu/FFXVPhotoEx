@@ -15,11 +15,10 @@ type
   end;
 
   TJpegSsExtractor = class(TComponent)
-    procedure Extract(
+    function Extract(
       const InStream: TFileStream;
-      const OutStream: TFileStream;
-      out Result: TJpegExtractResult
-    );
+      const OutStream: TFileStream
+    ): TJpegExtractResult;
   end;
 
 implementation
@@ -28,11 +27,10 @@ const
   ImageStartOffset = 36;
   ImageEndOffset = 130;
 
-procedure TJpegSsExtractor.Extract(
+function TJpegSsExtractor.Extract(
   const InStream: TFileStream;
-  const OutStream: TFileStream;
-  out Result: TJpegExtractResult
-);
+  const OutStream: TFileStream
+): TJpegExtractResult;
 begin
   Result.InputSize := InStream.Size;
   Result.CalculatedJpegSize := Result.InputSize - ImageStartOffset - ImageEndOffset;

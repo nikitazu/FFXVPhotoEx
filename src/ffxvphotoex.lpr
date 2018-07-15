@@ -181,7 +181,7 @@ begin
   try
     OutStream := TFileStream.Create(OutName, fmCreate);
     try
-      Extractor.Extract(InStream, OutStream, Result);
+      Result := Extractor.Extract(InStream, OutStream);
       if Result.RealJpegSize <> Result.CalculatedJpegSize then begin
         WriteLn(
           StdErr
