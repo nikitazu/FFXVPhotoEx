@@ -164,10 +164,10 @@ end;
 
 procedure TFFXVPhotoEx.ExtractImage(const InName: String);
 var
-  InFile: File;
+  InStream: TFileStream;
   InFileOpened: Boolean;
   InSize: LongInt;
-  OutFile: File;
+  OutStream: TFileStream;
   OutFileOpened: Boolean;
   OutName: String;
   OutSize: LongInt;
@@ -187,37 +187,35 @@ begin
   WriteLn('Extracting ', InName, ' to ', OutName);
 
   try
-    AssignFile(InFile, InName);
+    InStream := TFileStream.Create(InName, fmOpenRead);
     InFileOpened := True;
-    Reset(InFile, 1);
 
-    AssignFile(OutFile, OutName);
+    OutStream := TFileStream.Create(OutName, fmOpenWrite);
     OutFileOpened := True;
-    ReWrite(OutFile, 1);
 
-    InSize := FileSize(InFile);
+    InSize := InStream.Size;
     OutSize := InSize - ImageStartOffset - ImageEndOffset;
 
     if ((InSize = 0) or (OutSize <= 0)) then begin
       raise Exception.Create('Invalid file format');
     end;
 
-    Seek(InFile, ImageStartOffset);
+    InStream.Seek(ImageStartOffset, soFromBeginning);
     repeat
-      BlockRead(InFile, Buf, SizeOf(Buf), NumRead);
+      NumRead := InStream.Read(Buf, SizeOf(Buf));
       NumReadTotal += NumRead;
       if (NumReadTotal < OutSize) then begin
-        BlockWrite(OutFile, Buf, NumRead, NumWritten);
+        NumWritten := OutStream.Write(Buf, NumRead);
         NumWrittenTotal += NumWritten;
       end;
     until (NumRead = 0) or (NumWritten <> NumRead) or (NumReadTotal >= OutSize);
 
   finally
     if InFileOpened then begin
-      CloseFile(InFile);
+      FreeAndNil(InStream);
     end;
     if OutFileOpened then begin
-      CloseFile(OutFile);
+      FreeAndNil(OutStream);
     end;
     if OutFileOpened and (OutSize <= 0) then begin
       DeleteFile(OutName);
