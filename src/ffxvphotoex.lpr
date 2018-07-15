@@ -219,7 +219,7 @@ begin
     if OutFileOpened then begin
       CloseFile(OutFile);
     end;
-    if OutSize <= 0 then begin
+    if OutFileOpened and (OutSize <= 0) then begin
       DeleteFile(OutName);
     end;
   end;
