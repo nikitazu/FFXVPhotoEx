@@ -165,50 +165,50 @@ end;
 procedure TFFXVPhotoEx.ExtractImage(const InName: String);
 var
   InStream: TFileStream;
-  InFileOpened: Boolean;
   InSize: LongInt;
   OutStream: TFileStream;
-  OutFileOpened: Boolean;
   OutName: String;
   OutSize: LongInt;
   NumWrittenTotal: LongInt = 0;
-
-  const
-    ImageStartOffset = 36;
-    ImageEndOffset = 130;
+const
+  ImageStartOffset = 36;
+  ImageEndOffset = 130;
 begin
   OutName := InName + '.jpg';
 
   WriteLn('Extracting ', InName, ' to ', OutName);
 
+  InStream := TFileStream.Create(InName, fmOpenRead);
   try
-    InStream := TFileStream.Create(InName, fmOpenRead);
-    InFileOpened := True;
-
     OutStream := TFileStream.Create(OutName, fmOpenWrite);
-    OutFileOpened := True;
+    try
+      InSize := InStream.Size;
+      OutSize := InSize - ImageStartOffset - ImageEndOffset;
 
-    InSize := InStream.Size;
-    OutSize := InSize - ImageStartOffset - ImageEndOffset;
+      if ((InSize = 0) or (OutSize <= 0)) then begin
+        raise Exception.Create('Invalid file format');
+      end;
 
-    if ((InSize = 0) or (OutSize <= 0)) then begin
-      raise Exception.Create('Invalid file format');
-    end;
+      InStream.Seek(ImageStartOffset, soFromBeginning);
+      OutStream.Position := 0;
+      NumWrittenTotal := OutStream.CopyFrom(InStream, OutSize);
 
-    InStream.Seek(ImageStartOffset, soFromBeginning);
-    OutStream.Position := 0;
-    NumWrittenTotal := OutStream.CopyFrom(InStream, OutSize);
-
-  finally
-    if InFileOpened then begin
-      FreeAndNil(InStream);
-    end;
-    if OutFileOpened then begin
+      if NumWrittenTotal <> OutSize then begin
+        WriteLn(
+          'Warning: number of written bytes differs: expected='
+        , OutSize
+        , ' actual='
+        , NumWrittenTotal
+        );
+      end;
+    finally
       FreeAndNil(OutStream);
+      if OutSize <= 0 then begin
+        DeleteFile(OutName);
+      end;
     end;
-    if OutFileOpened and (OutSize <= 0) then begin
-      DeleteFile(OutName);
-    end;
+  finally
+    FreeAndNil(InStream);
   end;
 
 end;
