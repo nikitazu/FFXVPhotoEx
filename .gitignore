@@ -29,6 +29,6 @@ lib/
 # Application bundle for Mac OS
 *.app/
 
-# Binary file made by lazarus
-src/ffxvphotoex
+# Lazarus output
+bin/*
 
