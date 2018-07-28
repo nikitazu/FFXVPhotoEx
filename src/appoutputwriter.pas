@@ -20,10 +20,10 @@ procedure WriteHelp(AppName: String);
 begin
   writeln('Usage: ', AppName, ' [-f|-d] input');
   writeln(' --help              : Prints help');
+  writeln('                       alias: -h');
   writeln('');
   writeln(' --dir=indir         : Converts files inside indir from *.ss to *.jpg');
   writeln('                       alias -d indir');
-  writeln('                       alias: -h');
   writeln('');
   writeln(' --file=infile.ss    : Converts infile.ss to infile.jpg');
   writeln('                       alias -f infile.ss');
