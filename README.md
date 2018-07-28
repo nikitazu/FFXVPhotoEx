@@ -8,9 +8,26 @@ FFXVPhotoEx helps you to extract internal photos made during FFXV gameplay by Pr
 - TODO
 
 
-## Requirements to build this software
+### Requirements to build this software
 
 - TODO
+
+
+### Usage
+
+ffxvphotoex [-f|-d] input
+  --help              : Prints help
+                        alias: -h
+
+  --dir=indir         : Converts files inside indir from *.ss to *.jpg
+                        alias -d indir
+
+  --file=infile.ss    : Converts infile.ss to infile.jpg
+                        alias -f infile.ss
+
+  --continue-on-error : Does not stop processing on error
+                        when processing a directory
+                        alias -c
 
 
 ### Legal stuff
@@ -31,4 +48,3 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with FFXVPhotoEx.  If not, see <https://www.gnu.org/licenses/>.
-
