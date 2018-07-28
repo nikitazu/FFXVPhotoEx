@@ -15,6 +15,7 @@ FFXVPhotoEx helps you to extract internal photos made during FFXV gameplay by Pr
 
 ### Usage
 
+```
 ffxvphotoex [-f|-d] input
   --help              : Prints help
                         alias: -h
@@ -28,6 +29,7 @@ ffxvphotoex [-f|-d] input
   --continue-on-error : Does not stop processing on error
                         when processing a directory
                         alias -c
+```
 
 
 ### Legal stuff
