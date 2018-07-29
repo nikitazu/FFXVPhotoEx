@@ -18,7 +18,7 @@ FFXVPhotoEx helps you to extract internal photos made during FFXV gameplay by Pr
 ```
 ffxvphotoex [-f|-d] input
   --help              : Prints help
-                        alias: -h
+                        alias -h
 
   --dir=indir         : Converts files inside indir from *.ss to *.jpg
                         alias -d indir
